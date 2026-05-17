@@ -1,33 +1,41 @@
 # PlatonicSolidsGenerator.jl
 
-PlatonicSolidsGenerator.jl は、Makie.jl で正多面体を可視化し、3D プリンタ向けの STL ファイルとして書き出す Julia パッケージです。
+PlatonicSolidsGenerator.jl is a Julia package for generating Platonic solids,
+visualizing them with Makie.jl, and exporting them as STL files for 3D printing.
 
-Bambu Lab / Bambu Studio などのスライサーへ読み込む用途を想定し、STL 座標は millimeter として扱います。STL 形式自体には単位情報がないため、`bbox_mm` で指定した数値を mm としてスライサー側で解釈してください。
+The package is designed for workflows that import STL files into slicers such
+as Bambu Studio. STL coordinates are treated as millimeters. Because STL files
+do not store unit metadata, slicers should interpret the value passed to
+`bbox_mm` as millimeters.
 
 ## Features
 
-- 5 種類の正多面体を生成
-  - 正四面体 `:tetrahedron` / `4`
-  - 立方体 `:cube` / `6`
-  - 正八面体 `:octahedron` / `8`
-  - 正十二面体 `:dodecahedron` / `12`
-  - 正二十面体 `:icosahedron` / `20`
-- Makie.jl による 3D 可視化
-- binary STL 書き出し
-- `bbox_mm` による最大 bounding box 寸法指定
-- `placement=:flat` による 3D プリント向けのベッド配置
-- 将来の 3MF 書き出しに向けた `write_mesh` API
+- Generate all 5 Platonic solids:
+  - Tetrahedron `:tetrahedron` / `4`
+  - Cube `:cube` / `6`
+  - Octahedron `:octahedron` / `8`
+  - Dodecahedron `:dodecahedron` / `12`
+  - Icosahedron `:icosahedron` / `20`
+- 3D visualization with Makie.jl
+- Binary STL export
+- Maximum bounding-box size control with `bbox_mm`
+- Print-bed placement with `placement=:flat`
+- `write_mesh` API prepared for future 3MF export support
+
+## Provenance
+
+This project was generated with Codex.
 
 ## Installation
 
-このリポジトリをローカルパッケージとして使う場合:
+To use this repository as a local package:
 
 ```julia
 using Pkg
 Pkg.develop(path="/path/to/PlatonicSolidsGenerator.jl")
 ```
 
-このディレクトリで直接試す場合:
+To try it directly from this directory:
 
 ```sh
 julia --project=.
@@ -39,7 +47,7 @@ using PlatonicSolidsGenerator
 
 ## Quick Start
 
-### STL を書き出す
+### Export an STL File
 
 ```julia
 using PlatonicSolidsGenerator
@@ -48,9 +56,11 @@ write_mesh("cube.stl", :cube; bbox_mm=30.0, placement=:flat)
 write_stl("icosahedron.stl", :icosahedron; bbox_mm=40.0, placement=:flat)
 ```
 
-`placement=:flat` は、ある 1 面を `z=0` の xy 平面に置き、全頂点が `z >= 0` になるように配置します。Bambu Studio などへ読み込む STL にはこの指定が便利です。
+`placement=:flat` places one face on the xy plane at `z=0` and ensures that all
+vertices have `z >= 0`. This is convenient for STL files that will be imported
+into slicers such as Bambu Studio.
 
-### Makie で可視化する
+### Visualize with Makie
 
 ```julia
 using GLMakie
@@ -60,9 +70,10 @@ fig = visualize_solid(:dodecahedron; bbox_mm=30.0, placement=:flat)
 display(fig)
 ```
 
-Makie の backend は利用側で選んでください。GLMakie, WGLMakie, CairoMakie などをアプリケーション側で読み込んでから `visualize_solid` を使います。
+Choose the Makie backend in the consuming application. Load GLMakie, WGLMakie,
+CairoMakie, or another backend before calling `visualize_solid`.
 
-### GeometryBasics.Mesh を得る
+### Get a GeometryBasics.Mesh
 
 ```julia
 using PlatonicSolidsGenerator
@@ -70,16 +81,18 @@ using PlatonicSolidsGenerator
 mesh = platonic_solid(20; bbox_mm=25.0)
 ```
 
-`platonic_solid` は Makie の `mesh!` などで使える `GeometryBasics.Mesh` を返します。
+`platonic_solid` returns a `GeometryBasics.Mesh` that can be passed to Makie's
+`mesh!` and related APIs.
 
 ## Placement
 
-`placement` は以下を指定できます。
+`placement` accepts the following values:
 
-- `:center`: デフォルト。中心を原点に置きます。数学的な可視化や形状検証向けです。
-- `:flat`: ある面を xy 平面、つまり `z=0` に置きます。3D プリント向けです。
+- `:center`: The default. Places the solid around the origin. Use this for
+  mathematical visualization and geometry checks.
+- `:flat`: Places one face on the xy plane at `z=0`. Use this for 3D printing.
 
-例:
+Example:
 
 ```julia
 centered = platonic_solid(:tetrahedron; bbox_mm=30.0, placement=:center)
@@ -96,7 +109,7 @@ write_stl(path, kind; bbox_mm=30.0, placement=:center, name=nothing)
 write_mesh(path, kind; bbox_mm=30.0, placement=:center, format=:auto, metadata=Dict())
 ```
 
-`kind` は symbol または面数で指定できます。
+`kind` can be specified as a symbol or by number of faces.
 
 ```julia
 platonic_solid(:cube)
@@ -106,19 +119,22 @@ write_mesh("solid.stl", 12; bbox_mm=50.0, placement=:flat)
 
 ## 3MF Support
 
-`.3mf` は現時点では未実装です。
+`.3mf` export is not implemented yet.
 
-ただし `write_mesh(path, kind; format=:auto)` は `.3mf` 拡張子を将来対応予定の形式として認識し、現在は明示的な未対応エラーを返します。今後、同じ内部 mesh 表現から core 3MF writer を追加できる設計にしています。
+However, `write_mesh(path, kind; format=:auto)` recognizes the `.3mf` extension
+as a planned future format and currently raises an explicit unsupported-format
+error. The API is structured so a core 3MF writer can later be added on top of
+the same internal mesh representation.
 
 ## Example
 
-5 種類の STL を `exports/` に生成します。
+Generate STL files for all 5 supported solids under `exports/`:
 
 ```sh
 julia --project=. examples/generate_solids.jl
 ```
 
-生成されるファイル:
+Generated files:
 
 ```text
 exports/tetrahedron.stl
@@ -134,13 +150,12 @@ exports/icosahedron.stl
 julia --project=. -e 'using Pkg; Pkg.test()'
 ```
 
-テストでは以下を確認しています。
+The tests cover:
 
-- 対応する正多面体の一覧
-- symbol 指定と面数指定の対応
-- `bbox_mm` によるスケーリング
-- `placement=:flat` で底面が `z=0` に置かれること
-- binary STL の三角形数とファイルサイズ
-- `.3mf` が明示的な未対応エラーを返すこと
-- Makie 可視化の smoke test
-# PlatonicSolidsGenerator.jl
+- The list of supported Platonic solids
+- Symbol-based and face-count-based solid selection
+- Scaling with `bbox_mm`
+- Bottom-face placement at `z=0` with `placement=:flat`
+- Triangle counts and file sizes for binary STL output
+- Explicit unsupported-format errors for `.3mf`
+- Makie visualization smoke tests

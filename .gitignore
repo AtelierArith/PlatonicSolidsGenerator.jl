@@ -1,0 +1,19 @@
+# macOS metadata
+.DS_Store
+
+# Local Codex/Superpowers state
+.superpowers/
+
+# Julia local outputs
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+*.cov
+
+# Generated export artifacts
+exports/
+
+# Temporary files
+*.tmp
+*.bak
+*~
