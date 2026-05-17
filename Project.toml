@@ -1,0 +1,16 @@
+name = "PlatonicSolidsGenerator"
+uuid = "ddf45820-7a2a-4b81-a3ee-8cf881c2b3c7"
+version = "0.1.0"
+authors = ["SatoshiTerasaki <terasakisatoshi.math@gmail.com>"]
+
+[deps]
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+
+[compat]
+GeometryBasics = "0.5"
+Makie = "0.21, 0.22, 0.23, 0.24"
+julia = "1.10"
+
+[workspace]
+projects = ["test"]
