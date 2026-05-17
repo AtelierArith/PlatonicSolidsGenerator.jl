@@ -1,5 +1,7 @@
 # PlatonicSolidsGenerator.jl
 
+![](./demo.png)
+
 PlatonicSolidsGenerator.jl is a Julia package for generating Platonic solids,
 visualizing them with Makie.jl, and exporting them as STL files for 3D printing.
 
