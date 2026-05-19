@@ -121,12 +121,14 @@ write_mesh("solid.stl", 12; bbox_mm=50.0, placement=:flat)
 
 ## 3MF Support
 
-`.3mf` export is not implemented yet.
+`write_mesh` supports `.3mf` export directly:
 
-However, `write_mesh(path, kind; format=:auto)` recognizes the `.3mf` extension
-as a planned future format and currently raises an explicit unsupported-format
-error. The API is structured so a core 3MF writer can later be added on top of
-the same internal mesh representation.
+```julia
+write_mesh("cube.3mf", :cube; bbox_mm=30.0, placement=:flat)
+```
+
+The output is a spec-compliant ZIP archive containing `[Content_Types].xml`,
+`_rels/.rels`, and `3D/3dmodel.model`. Coordinates are written in millimeters.
 
 ## Example
 

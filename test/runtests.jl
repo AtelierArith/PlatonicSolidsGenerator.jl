@@ -1,5 +1,6 @@
 using Test
 using PlatonicSolidsGenerator
+using ZipFile
 
 @testset "supported solids" begin
     @test supported_solids() ==
@@ -102,16 +103,42 @@ end
               flat_path
         @test filesize(flat_path) == 84 + 50 * 4
 
-        err = try
-            write_mesh(joinpath(dir, "future.3mf"), :cube)
-            nothing
-        catch e
-            e
-        end
-        @test err isa ErrorException
-        @test occursin("3MF export is not implemented yet", sprint(showerror, err))
-
         @test_throws ArgumentError write_mesh(joinpath(dir, "mesh.obj"), :cube)
+    end
+end
+
+@testset "3MF export" begin
+    mktempdir() do dir
+        for kind in supported_solids()
+            path = joinpath(dir, string(kind, ".3mf"))
+            @test write_mesh(path, kind; bbox_mm = 30.0, placement = :flat) == path
+            @test isfile(path)
+
+            zf = ZipFile.Reader(path)
+            names = [f.name for f in zf.files]
+            @test "[Content_Types].xml" in names
+            @test "_rels/.rels" in names
+            @test "3D/3dmodel.model" in names
+
+            model_file = only(filter(f -> f.name == "3D/3dmodel.model", zf.files))
+            xml = read(model_file, String)
+            @test occursin("http://schemas.microsoft.com/3dmanufacturing/core/2015/02", xml)
+            @test occursin("millimeter", xml)
+            @test occursin("<vertices>", xml)
+            @test occursin("<triangles>", xml)
+            close(zf)
+        end
+
+        ct_path = joinpath(dir, "ct_check.3mf")
+        write_mesh(ct_path, :cube; bbox_mm = 10.0)
+        zf = ZipFile.Reader(ct_path)
+        ct_file = only(filter(f -> f.name == "[Content_Types].xml", zf.files))
+        ct = read(ct_file, String)
+        @test occursin("3dmanufacturing-3dmodel+xml", ct)
+        rels_file = only(filter(f -> f.name == "_rels/.rels", zf.files))
+        rels = read(rels_file, String)
+        @test occursin("/3D/3dmodel.model", rels)
+        close(zf)
     end
 end
 

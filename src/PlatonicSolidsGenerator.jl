@@ -3,6 +3,7 @@ module PlatonicSolidsGenerator
 export supported_solids, platonic_solid, visualize_solid, write_stl, write_mesh
 
 include("geometry.jl")
+include("threemf.jl")
 include("stl.jl")
 include("visualization.jl")
 

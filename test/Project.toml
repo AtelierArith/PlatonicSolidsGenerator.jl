@@ -1,6 +1,7 @@
 [deps]
 PlatonicSolidsGenerator = "ddf45820-7a2a-4b81-a3ee-8cf881c2b3c7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [sources]
 PlatonicSolidsGenerator = {path = ".."}

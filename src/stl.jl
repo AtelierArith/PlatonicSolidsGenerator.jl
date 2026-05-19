@@ -85,9 +85,12 @@ function write_mesh(
     if resolved == :stl
         return write_stl(path, kind; bbox_mm, placement, name = _metadata_name(metadata))
     elseif resolved == Symbol("3mf")
-        error(
-            "3MF export is not implemented yet. The mesh/export boundary is ready for a future core 3MF writer.",
+        solid = solid_mesh(kind; bbox_mm, placement, metadata)
+        tmesh = ThreeMFMesh(
+            solid.vertices,
+            [(t[1] - 1, t[2] - 1, t[3] - 1) for t in solid.triangles],
         )
+        return _write_3mf(tmesh, path)
     end
     throw(
         ArgumentError(
