@@ -1,5 +1,3 @@
-using GeometryBasics
-
 const SOLID_KIND_BY_FACE_COUNT = Dict(
     4 => :tetrahedron,
     6 => :cube,
@@ -346,5 +344,37 @@ function platonic_solid(kind; bbox_mm = 30.0, placement = :center)
     solid = solid_mesh(kind; bbox_mm, placement)
     points = [Point3f(v) for v in solid.vertices]
     faces = [TriangleFace{Int}(tri...) for tri in solid.triangles]
-    return GeometryBasics.Mesh(points, faces)
+    return Mesh(points, faces)
+end
+
+"""
+    polyhedron_edges(kind; bbox_mm=30.0, placement=:center)
+
+Return a `Vector{Point3f}` of line-segment endpoints for the polygon edges of a
+Platonic solid. Consecutive pairs form one edge. Pass directly to `linesegments!`.
+Unlike `wireframe!`, this omits triangulation diagonals and shows only the true
+face edges of the polyhedron.
+"""
+function polyhedron_edges(kind; bbox_mm = 30.0, placement = :center)
+    name = resolve_solid_kind(kind)
+    bbox = _validate_bbox_mm(bbox_mm)
+    where = _validate_placement(placement)
+    vertices, faces = _raw_faces(Val(name))
+    placed = _place_vertices(vertices, faces, bbox, Val(where))
+    seen = Set{Tuple{Int,Int}}()
+    segments = Point3f[]
+    for face in faces
+        n = length(face)
+        for i in 1:n
+            a = face[i]
+            b = face[mod1(i + 1, n)]
+            key = a < b ? (a, b) : (b, a)
+            if key ∉ seen
+                push!(seen, key)
+                push!(segments, Point3f(placed[a]))
+                push!(segments, Point3f(placed[b]))
+            end
+        end
+    end
+    return segments
 end

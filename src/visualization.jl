@@ -1,5 +1,3 @@
-using Makie
-
 """
     visualize_solid(kind; bbox_mm=30.0, placement=:center, axis=true)
 

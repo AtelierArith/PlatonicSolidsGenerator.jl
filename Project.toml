@@ -3,18 +3,20 @@ uuid = "ddf45820-7a2a-4b81-a3ee-8cf881c2b3c7"
 version = "0.1.0"
 authors = ["SatoshiTerasaki <terasakisatoshi.math@gmail.com>"]
 
+[workspace]
+projects = ["test"]
+
 [deps]
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 ZipFile = "a5390f91-8eb1-5f08-bee0-b1d1ffed6cea"
 
 [compat]
 EzXML = "1.2.3"
+GLMakie = "0.13.10"
 GeometryBasics = "0.5"
 Makie = "0.21, 0.22, 0.23, 0.24"
 ZipFile = "0.10.1"
 julia = "1.10"
-
-[workspace]
-projects = ["test"]

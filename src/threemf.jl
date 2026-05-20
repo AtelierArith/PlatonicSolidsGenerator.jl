@@ -1,6 +1,3 @@
-using EzXML
-using ZipFile
-
 struct ThreeMFMesh
     vertices::Vector{Tuple{Float64,Float64,Float64}}
     triangles::Vector{Tuple{Int,Int,Int}}
